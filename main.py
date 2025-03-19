@@ -10,7 +10,7 @@ from aiogram.types import Message, FSInputFile
 TOKEN = "7930244847:AAHprORR4-qh7oTEIuTJBKm-0eC3JZ9gRAI"
 BOT_USERNAME = "instaBunker_robot"  # O'zingizning bot username-ni kiriting
 
-# Bot va dispatcher obyektlarini yaratamiz
+# Bot va dispatcher obyektlarini yaratamizpip install aiogram
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
