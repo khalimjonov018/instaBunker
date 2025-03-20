@@ -7,7 +7,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, FSInputFile
 
 # Bot tokenini shu yerga kiriting
-TOKEN = "7930244847:AAHprORR4-qh7oTEIuTJBKm-0eC3JZ9gRAI"
+TOKEN = "6674407743:AAGCDQkI1TzLK6hnKhRKStCnnHpxqkBxGz0"
 BOT_USERNAME = "instaBunker_robot"  # O'zingizning bot username-ni kiriting
 
 # Bot va dispatcher obyektlarini yaratamizpip install aiogram
