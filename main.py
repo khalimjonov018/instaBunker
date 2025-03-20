@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, FSInputFile
 
 # Bot tokenini shu yerga kiriting
-TOKEN = "7930244847:AAHprORR4-qh7oTEIuTJBKm-0eC3JZ9gRAI"
+TOKEN = "6674407743:AAGCDQkI1TzLK6hnKhRKStCnnHpxqkBxGz0"
 BOT_USERNAME = "instaBunker_robot"  # O'zingizning bot username-ni kiriting
 
 # Bot va dispatcher obyektlarini yaratamiz
@@ -40,7 +40,7 @@ def download_instagram_media(instagram_url):
             "outtmpl": "instagram_media.%(ext)s",
             "format": "bestvideo+bestaudio/best",
             "merge_output_format": "mp4",
-            "cookies": "cookies.txt",
+            #"cookies": "cookies.txt",
             "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}]
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
