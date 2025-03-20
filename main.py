@@ -1,18 +1,30 @@
 import logging
 import asyncio
 import os
+import subprocess
 import yt_dlp
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import Message, FSInputFile
 
 # Bot tokenini shu yerga kiriting
-TOKEN = "6674407743:AAGCDQkI1TzLK6hnKhRKStCnnHpxqkBxGz0"
+TOKEN = "7930244847:AAHprORR4-qh7oTEIuTJBKm-0eC3JZ9gRAI"
 BOT_USERNAME = "instaBunker_robot"  # O'zingizning bot username-ni kiriting
 
-# Bot va dispatcher obyektlarini yaratamizpip install aiogram
+# Bot va dispatcher obyektlarini yaratamiz
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+
+
+def install_ffmpeg():
+    """ffmpeg o‘rnatilganligini tekshirish va kerak bo‘lsa o‘rnatish"""
+    try:
+        subprocess.run(["ffmpeg", "-version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("✅ ffmpeg allaqachon o‘rnatilgan.")
+    except FileNotFoundError:
+        print("⚠️ ffmpeg topilmadi, o‘rnatilmoqda...")
+        os.system("apt update && apt install -y ffmpeg")
+        print("✅ ffmpeg muvaffaqiyatli o‘rnatildi!")
 
 
 @dp.message(CommandStart())
@@ -25,17 +37,17 @@ def download_instagram_media(instagram_url):
     """Instagram video yoki rasmni yuklab olish funksiyasi"""
     try:
         ydl_opts = {
-            "outtmpl": "instagram_media.%(ext)s",  # Faqat bitta nom bilan yuklab olish
-            "format": "bestvideo+bestaudio/best",  # Eng yaxshi sifat tanlanadi
-            "merge_output_format": "mp4",  # Video uchun MP4 format
-            "cookies": "cookies.txt",  # Instagram login cookies faylini ishlatamiz
+            "outtmpl": "instagram_media.%(ext)s",
+            "format": "bestvideo+bestaudio/best",
+            "merge_output_format": "mp4",
+            "cookies": "cookies.txt",
             "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}]
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(instagram_url, download=True)
-            file_path = ydl.prepare_filename(info_dict)  # Fayl nomini olish
+            file_path = ydl.prepare_filename(info_dict)
             file_size = os.path.getsize(file_path) / (1024 * 1024)  # MB ga o'tkazamiz
-            media_type = info_dict.get("ext")  # Foydali: video yoki rasm aniqlash
+            media_type = info_dict.get("ext")
             return file_path, file_size, media_type
     except Exception as e:
         logging.error(f"Instagram media yuklashda xatolik: {e}", exc_info=True)
@@ -52,7 +64,7 @@ async def process_instagram_media(message: Message):
 
     media_path, file_size, media_type = download_instagram_media(message.text)
     if media_path:
-        if media_type == "mp4":  # Video bo'lsa
+        if media_type == "mp4":
             media_file = FSInputFile(media_path)
 
             caption = (
@@ -64,7 +76,7 @@ async def process_instagram_media(message: Message):
 
             await message.answer_video(video=media_file, caption=caption, parse_mode="HTML")
 
-        else:  # Agar rasm bo'lsa
+        else:
             media_file = FSInputFile(media_path)
             await message.answer_photo(photo=media_file, caption="✅ Instagram rasmi yuklandi!")
 
@@ -75,6 +87,7 @@ async def process_instagram_media(message: Message):
 
 async def main():
     logging.basicConfig(level=logging.INFO)
+    install_ffmpeg()  # ffmpeg o‘rnatilganligini tekshiramiz
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
