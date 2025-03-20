@@ -40,7 +40,7 @@ def download_instagram_media(instagram_url):
             "outtmpl": "instagram_media.%(ext)s",
             "format": "bestvideo+bestaudio/best",
             "merge_output_format": "mp4",
-            "cookies": "cookies.txt",
+            #"cookies": "cookies.txt",
             "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}]
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
