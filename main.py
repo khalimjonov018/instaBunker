@@ -34,24 +34,35 @@ async def start(message: Message):
 
 
 def download_instagram_media(instagram_url):
-    """Instagram video yoki rasmni yuklab olish funksiyasi"""
+    """Instagram video yoki rasmni to'g'ri formatda yuklab olish"""
     try:
         ydl_opts = {
             "outtmpl": "instagram_media.%(ext)s",
-            "format": "bestvideo+bestaudio/best",
-            "merge_output_format": "mp4",
-            #"cookies": "cookies.txt",
-            "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}]
+            "format": "best[ext=mp4]/best",  # Avval MP4 formatdagi versiyasini olib ko'radi
+            "postprocessors": [
+                {
+                    "key": "FFmpegVideoConvertor",
+                    "preferedformat": "mp4"  # Majburiy MP4 formatga o'tkazadi
+                }
+            ],
+            "postprocessor_args": [
+                "-c:v", "libx264",  # Video kodek
+                "-preset", "fast",  # Tez ishlash uchun
+                "-movflags", "+faststart"  # Streaming uchun optimallashtiradi (mobil uchun juda muhim)
+            ],
+            "ffmpeg_location": "/usr/bin/ffmpeg",  # Agar kerak bo‘lsa
+            "noplaylist": True,
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(instagram_url, download=True)
             file_path = ydl.prepare_filename(info_dict)
-            file_size = os.path.getsize(file_path) / (1024 * 1024)  # MB ga o'tkazamiz
+            file_size = os.path.getsize(file_path) / (1024 * 1024)
             media_type = info_dict.get("ext")
             return info_dict, file_path, file_size, media_type
     except Exception as e:
         logging.error(f"Instagram media yuklashda xatolik: {e}", exc_info=True)
         return None, None, None, None
+
 
 
 @dp.message()
