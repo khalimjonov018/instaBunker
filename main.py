@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, FSInputFile
 
 # Bot tokenini shu yerga kiriting
-TOKEN = "6674407743:AAGCDQkI1TzLK6hnKhRKStCnnHpxqkBxGz0"
+TOKEN = "7930244847:AAHprORR4-qh7oTEIuTJBKm-0eC3JZ9gRAI"
 BOT_USERNAME = "instaBunker_robot"  # O'zingizning bot username-ni kiriting
 
 # Bot va dispatcher obyektlarini yaratamiz
@@ -48,10 +48,10 @@ def download_instagram_media(instagram_url):
             file_path = ydl.prepare_filename(info_dict)
             file_size = os.path.getsize(file_path) / (1024 * 1024)  # MB ga o'tkazamiz
             media_type = info_dict.get("ext")
-            return file_path, file_size, media_type
+            return info_dict, file_path, file_size, media_type
     except Exception as e:
         logging.error(f"Instagram media yuklashda xatolik: {e}", exc_info=True)
-        return None, None, None
+        return None, None, None, None
 
 
 @dp.message()
@@ -62,16 +62,22 @@ async def process_instagram_media(message: Message):
 
     await message.answer("⏳ Media yuklanmoqda, iltimos kuting...")
 
-    media_path, file_size, media_type = download_instagram_media(message.text)
+    info_dict, media_path, file_size, media_type = download_instagram_media(message.text)
     if media_path:
         if media_type == "mp4":
             media_file = FSInputFile(media_path)
 
+            # Video davomiyligini olish
+            duration = info_dict.get('duration', 'N/A') if media_type == "mp4" else 'N/A'
+
             caption = (
                 "✅ <b>Instagram videosi yuklandi!</b>\n\n"
                 f"📦 <b>Hajmi:</b> {file_size:.2f} MB\n"
+                f"⏳ <b>Yuklash vaqti:</b> {duration} soniya\n"
                 f"🔗 <b>Havola:</b> <a href='{message.text}'>Ko‘rish</a>\n\n"
-                f"🤖 <b>Bot orqali yuklab olindi:</b> @{BOT_USERNAME}"
+                "📌 <b>Qo‘shimcha:</b> Agar boshqa video yoki rasm yubormoqchi bo'lsangiz, havolani yuboring!\n\n"
+                "🤖 <b>Bot orqali yuklab olindi:</b> {@instaBunker_robot}\n"
+                "📣 Boshqa videolarni ko'rish uchun <a href='https://t.me/KinoBunkerNews'>kanalimga</a> tashrif buyuring."
             )
 
             await message.answer_video(video=media_file, caption=caption, parse_mode="HTML")
